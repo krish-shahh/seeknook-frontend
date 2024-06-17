@@ -53,7 +53,7 @@ const AdminPanel = () => {
   const fetchBusinesses = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5001/api/businesses');
+      const response = await axios.get('https://seeknook-backend-2564a672bd98.herokuapp.com/api/businesses');
       setBusinesses(response.data);
       setLoading(false);
     } catch (error) {
@@ -66,7 +66,7 @@ const AdminPanel = () => {
   const fetchPendingBusinesses = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5001/api/businesses');
+      const response = await axios.get('https://seeknook-backend-2564a672bd98.herokuapp.com/api/businesses');
       const pendingBusinesses = response.data.filter(b => b.status === 'pending');
       setPendingBusinesses(pendingBusinesses);
       setLoading(false);
@@ -80,7 +80,7 @@ const AdminPanel = () => {
   const fetchFranchises = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5001/api/franchises');
+      const response = await axios.get('https://seeknook-backend-2564a672bd98.herokuapp.com/api/franchises');
       setFranchises(response.data);
       setLoading(false);
     } catch (error) {
@@ -93,7 +93,7 @@ const AdminPanel = () => {
   const fetchPendingFranchises = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5001/api/franchises');
+      const response = await axios.get('https://seeknook-backend-2564a672bd98.herokuapp.com/api/franchises');
       const pendingFranchises = response.data.filter(f => f.status === 'pending');
       setPendingFranchises(pendingFranchises);
       setLoading(false);
@@ -106,7 +106,7 @@ const AdminPanel = () => {
 
   const fetchAdminMessage = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/messages/admin-message');
+      const response = await axios.get('https://seeknook-backend-2564a672bd98.herokuapp.com/api/messages/admin-message');
       setAdminMessage(response.data.message);
     } catch (error) {
       console.error('Error fetching admin message:', error);
@@ -116,7 +116,7 @@ const AdminPanel = () => {
 
   const deleteBusiness = async (uuid) => {
     try {
-      await axios.delete(`http://localhost:5001/api/businesses/${uuid}`);
+      await axios.delete(`https://seeknook-backend-2564a672bd98.herokuapp.com/api/businesses/${uuid}`);
       message.success('Business deleted successfully.');
       fetchBusinesses();
     } catch (error) {
@@ -127,7 +127,7 @@ const AdminPanel = () => {
 
   const deleteFranchise = async (uuid) => {
     try {
-      await axios.delete(`http://localhost:5001/api/franchises/${uuid}`);
+      await axios.delete(`https://seeknook-backend-2564a672bd98.herokuapp.com/api/franchises/${uuid}`);
       message.success('Franchise deleted successfully.');
       fetchFranchises();
     } catch (error) {
@@ -138,7 +138,7 @@ const AdminPanel = () => {
 
   const updateBusinessStatus = async (uuid, status) => {
     try {
-      await axios.put(`http://localhost:5001/api/businesses/${uuid}`, { status });
+      await axios.put(`https://seeknook-backend-2564a672bd98.herokuapp.com/api/businesses/${uuid}`, { status });
       message.success(`Business ${status === 'approved' ? 'approved' : 'denied'} successfully`);
       fetchPendingBusinesses();
     } catch (error) {
@@ -149,7 +149,7 @@ const AdminPanel = () => {
 
   const updateFranchiseStatus = async (uuid, status) => {
     try {
-      await axios.put(`http://localhost:5001/api/franchises/${uuid}`, { status });
+      await axios.put(`https://seeknook-backend-2564a672bd98.herokuapp.com/api/franchises/${uuid}`, { status });
       message.success(`Franchise ${status === 'approved' ? 'approved' : 'denied'} successfully`);
       fetchPendingFranchises();
     } catch (error) {
@@ -160,7 +160,7 @@ const AdminPanel = () => {
 
   const approveAllPendingBusinesses = async () => {
     try {
-      const updatePromises = pendingBusinesses.map(business => axios.put(`http://localhost:5001/api/businesses/${business.uuid}`, { status: 'approved' }));
+      const updatePromises = pendingBusinesses.map(business => axios.put(`https://seeknook-backend-2564a672bd98.herokuapp.com/api/businesses/${business.uuid}`, { status: 'approved' }));
       await Promise.all(updatePromises);
       message.success('All pending businesses approved successfully');
       fetchPendingBusinesses();
@@ -172,7 +172,7 @@ const AdminPanel = () => {
 
   const approveAllPendingFranchises = async () => {
     try {
-      const updatePromises = pendingFranchises.map(franchise => axios.put(`http://localhost:5001/api/franchises/${franchise.uuid}`, { status: 'approved' }));
+      const updatePromises = pendingFranchises.map(franchise => axios.put(`https://seeknook-backend-2564a672bd98.herokuapp.com/api/franchises/${franchise.uuid}`, { status: 'approved' }));
       await Promise.all(updatePromises);
       message.success('All pending franchises approved successfully');
       fetchPendingFranchises();
@@ -184,7 +184,7 @@ const AdminPanel = () => {
 
   const saveAdminMessage = async (msg) => {
     try {
-      await axios.post('http://localhost:5001/api/messages/admin-message', { message: msg });
+      await axios.post('https://seeknook-backend-2564a672bd98.herokuapp.com/api/messages/admin-message', { message: msg });
       message.success('Admin message saved successfully.');
       setMessageModalVisible(false);
     } catch (error) {
@@ -195,7 +195,7 @@ const AdminPanel = () => {
 
   const deleteAdminMessage = async () => {
     try {
-      await axios.delete('http://localhost:5001/api/messages/admin-message');
+      await axios.delete('https://seeknook-backend-2564a672bd98.herokuapp.com/api/messages/admin-message');
       setAdminMessage('');
       message.success('Admin message deleted successfully.');
       setMessageModalVisible(false);
