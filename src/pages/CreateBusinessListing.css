@@ -1,0 +1,27 @@
+.tier-cards {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.tier-card {
+  width: 30%;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: border-color 0.3s;
+}
+
+.tier-card.selected {
+  border-color: #1890ff;
+}
+
+@media (max-width: 768px) {
+  .tier-cards {
+    flex-direction: column;
+  }
+
+  .tier-card {
+    width: 100%;
+  }
+}

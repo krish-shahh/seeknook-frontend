@@ -1,0 +1,32 @@
+.admin-panel {
+    padding: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .admin-panel {
+      padding: 10px;
+    }
+  
+    .admin-panel h1 {
+      font-size: 24px;
+      text-align: center;
+    }
+  
+    .admin-panel .ant-btn {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  
+    .admin-panel .ant-table {
+      overflow-x: auto;
+    }
+  
+    .admin-panel .ant-table-thead > tr > th {
+      white-space: nowrap;
+    }
+  
+    .admin-panel .ant-table-tbody > tr > td {
+      white-space: nowrap;
+    }
+  }
+  
