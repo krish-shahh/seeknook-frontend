@@ -10,7 +10,7 @@ const BusinessList = () => {
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(9);
+    const [pageSize, setPageSize] = useState(27);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterZip, setFilterZip] = useState('');
     const [serviceType, setServiceType] = useState('');
@@ -163,7 +163,7 @@ const BusinessList = () => {
                     ) : (
                         paginatedBusinesses.map(business => (
                             <div className="col-12 col-md-4 mb-3" key={business.id}>
-                                <BusinessCard business={business} userUid={userUid} />
+                                <BusinessCard business={business} />
                             </div>
                         ))
                     )
@@ -187,7 +187,7 @@ const BusinessList = () => {
                 centered
                 width={window.innerWidth <= 768 ? '100%' : '50%'}
             >
-                {selectedBusiness && <BusinessCard business={selectedBusiness} userUid={userUid} />}
+                {selectedBusiness && <BusinessCard business={selectedBusiness} />}
             </Modal>
         </div>
     );    

@@ -249,7 +249,7 @@ function Dashboard() {
           </Col>
         </Row>
         {listings.length > 0 && (
-          <Row gutter={16} justify="center" style={{ marginTop: '20px' }}>
+          <Row justify="center" style={{ marginTop: '20px' }}>
             <Col className="row mt-3 justify-content-center">
               <Title level={4}>My Listings</Title>
 
@@ -257,9 +257,9 @@ function Dashboard() {
               {isLoading ? (
                 <Spin size="large" />
               ) : (
-                <Row gutter={[16, 16]} justify="start">
+                <Row justify="start">
                   {listings.map(listing => (
-                    <Col key={listing.uuid} xs={24} md={12}>
+                    <Col key={listing.uuid} xs={24} md={16}>
                       <Card
                         actions={[
                           <Button type="primary" style={{ backgroundColor: 'green', borderColor: 'green' }} onClick={() => handleEditListing(listing)} icon={<EditOutlined />}>

@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Spin } from 'antd';
 import './App.css'; // Import the CSS file
 import RegistrationPage from './pages/RegistrationPage';
+import ContactUs from './pages/ContactUs';
 
 // Lazy load components
 const LoginPage = lazy(() => import('./pages/LoginPage'));
@@ -53,6 +54,7 @@ const App = () => {
           <Route path="/terms-of-use" element={<TermsOfUse />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/avoid-scams" element={<AvoidScams />} />
+          <Route path='/contact-us' element={<ContactUs />} />
         </Routes>
       </Suspense>
     </Router>

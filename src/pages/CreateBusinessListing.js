@@ -167,7 +167,7 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
   return (
     <Form form={form} layout="vertical" onFinish={onFinish} onFieldsChange={onFieldsChange}>
       <Form.Item name="name" label="Name/Posting Title" rules={[{ required: true, message: 'Please input your posting title!', max: 100 }]}>
-        <Input placeholder="Enter your posting title" maxLength={100} onChange={onTitleChange} disabled={isEditing} />
+        <Input placeholder="Enter your posting title" maxLength={100} onChange={onTitleChange} disabled={isEditing} value={form.getFieldValue('name')}/>
         <div style={{ marginTop: '10px' }}>{titleLength}/100 characters</div>
       </Form.Item>
 
@@ -247,7 +247,7 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
       </Form.Item>
 
       <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please input your description!', min: 1 }]}>
-        <TextArea rows={4} placeholder="Enter your description" maxLength={1000} onChange={onDescriptionChange} />
+        <TextArea rows={4} placeholder="Enter your description" maxLength={1000} onChange={onDescriptionChange} value={form.getFieldValue('description')} />
         <div style={{ marginTop: '10px' }}>{descriptionLength}/1000 characters</div>
       </Form.Item>
 
@@ -256,12 +256,13 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
         <Form.Item name="display_preferences" label="Display Preferences" rules={[{ required: true, message: 'Please select your preferences!' }]}>
           <Checkbox.Group style={{ width: '100%' }}>
             <Row gutter={[8, 8]}>
-              <Col xs={24} sm={12} md={8}><Checkbox value="email">Email</Checkbox></Col>
-              <Col xs={24} sm={12} md={8}><Checkbox value="phone">Phone</Checkbox></Col>
-              <Col xs={24} sm={12} md={8}><Checkbox value="city">Located in {zipCodeDetails.city || 'Chesterfield'}</Checkbox></Col>
-              <Col xs={24} sm={12} md={8}><Checkbox value="groupDiscount">Offers Group Discount</Checkbox></Col>
-              <Col xs={24} sm={12} md={8}><Checkbox value="licensedInsured">Licensed & Insured</Checkbox></Col>
-              <Col xs={24} sm={12} md={8}><Checkbox value="militaryDiscount">Military/Veteran Owned</Checkbox></Col>
+              <Col xs={24} sm={12} md={6}><Checkbox value="email">Email</Checkbox></Col>
+              <Col xs={24} sm={12} md={6}><Checkbox value="phone">Phone</Checkbox></Col>
+              <Col xs={24} sm={12} md={6}><Checkbox value="city">Located in {zipCodeDetails.city || 'Chesterfield'}</Checkbox></Col>
+              <Col xs={24} sm={12} md={6}><Checkbox value="groupDiscount">Offers Group Discount</Checkbox></Col>
+              <Col xs={24} sm={12} md={6}><Checkbox value="licensedInsured">Licensed & Insured</Checkbox></Col>
+              <Col xs={24} sm={12} md={6}><Checkbox value="militaryDiscount">Military/Veteran Owned</Checkbox></Col>
+              <Col xs={24} sm={12} md={6}><Checkbox value="hiring">We are Hiring</Checkbox></Col>
             </Row>
           </Checkbox.Group>
         </Form.Item>
@@ -280,7 +281,6 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
               <Col xs={24} sm={12} md={8}><Checkbox value="residential">Residential</Checkbox></Col>
               <Col xs={24} sm={12} md={8}><Checkbox value="commercial">Commercial</Checkbox></Col>
               <Col xs={24} sm={12} md={8}><Checkbox value="deliver">We Deliver</Checkbox></Col>
-              <Col xs={24} sm={12} md={8}><Checkbox value="hiring">Hiring</Checkbox></Col>
             </Row>
           </Checkbox.Group>
         </Form.Item>

@@ -90,7 +90,7 @@ const HomePage = () => {
         </ul>
       </div>
       <footer className="footer">
-        &copy; {new Date().getFullYear()} SeekNook | <Link to="/terms-of-use">Terms of Use</Link> | <Link to="/privacy-policy">Privacy Policy</Link> | <Link to="/avoid-scams">Scam Protection Guide</Link>
+        &copy; {new Date().getFullYear()} SeekNook | <Link to="/terms-of-use">Terms of Use</Link> | <Link to="/privacy-policy">Privacy Policy</Link> | <Link to="/avoid-scams">Scam Protection Guide</Link> | <Link to="/contact-us">Contact Us</Link>
       </footer>
     </div>
   );
