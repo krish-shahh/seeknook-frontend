@@ -73,11 +73,6 @@ const Navbar = () => {
           icon: <DashboardOutlined />
         },
         {
-          label: <Link to="/favorites">Favorites</Link>,
-          key: 'favorites',
-          icon: <HeartOutlined />
-        },
-        {
           label: 'Log Out',
           key: 'logout',
           onClick: handleLogout,
