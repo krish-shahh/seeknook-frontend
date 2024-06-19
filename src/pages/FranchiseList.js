@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import FranchiseCard from '../components/FranchiseCard';
-import SearchAndFilter from '../components/ServiceFilter';
+import FranchiseFilter from '../components/FranchiseFilter';
 import { Spin, Alert, List, Modal, Tag, Pagination } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 
@@ -86,7 +86,7 @@ const FranchisesList = () => {
     return (
         <div className="container">
             <div className="row justify-content-center">
-                <SearchAndFilter
+                <FranchiseFilter
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
                     filterZip={filterZip}
