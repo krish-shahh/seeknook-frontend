@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Button, Tooltip, Tag } from 'antd';
+import { Card, Button, Tooltip, Tag, Badge } from 'antd';
 import {
   PhoneOutlined, MailOutlined, EnvironmentOutlined,
   InstagramOutlined, FacebookOutlined, HeartOutlined, HeartFilled,
@@ -50,15 +50,20 @@ function FranchiseCard({ franchise }) {
   };
 
   const getBorderColor = () => {
-    switch (franchise.sponsorStatus) {
-      case 'gold':
-        return '#ffd700';
-      case 'bronze':
-        return '#cd7f32';
-      default:
-        return '#ddd';
+    if (!franchise.payment_preferences || franchise.payment_preferences.length === 0) {
+      return '#ddd';
     }
-  };
+  
+    if (franchise.payment_preferences.includes('gold')) {
+      return '#ffd700';
+    }
+  
+    if (franchise.payment_preferences.includes('bronze')) {
+      return '#cd7f32';
+    }
+  
+    return '#ddd';
+  };  
 
   const handleRevealPhone = () => {
     setRevealPhone(true);
@@ -79,7 +84,15 @@ function FranchiseCard({ franchise }) {
     over_1m: 'Over 1M'
   };
 
+  const isNewFranchise = () => {
+    const createdAt = new Date(franchise.created_at);
+    const now = new Date();
+    const timeDifference = now - createdAt;
+    return timeDifference <= 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  };
+
   return (
+    <Badge.Ribbon text="New" color="gray" style={{ display: isNewFranchise() ? 'inline-block' : 'none' }}>
     <Card style={{ marginTop: '20px', border: `1px solid ${getBorderColor()}`, borderRadius: '5px', width: '100%', color: 'black' }}>
       <Card.Meta
         title={
@@ -87,23 +100,23 @@ function FranchiseCard({ franchise }) {
             <span style={{ fontWeight: 'bold', color: 'black', whiteSpace: 'normal' }}>
               {franchise.name}
             </span>
-            {franchise.sponsorStatus && (
-              <Tooltip title={`${franchise.sponsorStatus.charAt(0).toUpperCase() + franchise.sponsorStatus.slice(1)} Sponsor`}>
+            {franchise.payment_preferences && franchise.payment_preferences.map((preference, index) => (
+              <Tooltip key={index} title={`${preference.charAt(0).toUpperCase() + preference.slice(1)} Sponsor`}>
                 <Tag
-                  color={franchise.sponsorStatus === 'gold' ? 'gold' : 'bronze'}
+                  color={preference === 'gold' ? 'gold' : 'bronze'}
                   style={{
                     fontWeight: 'bold',
-                    backgroundColor: franchise.sponsorStatus === 'gold' ? '#ffd700' : '#cd7f32',
-                    color: franchise.sponsorStatus === 'gold' ? 'black' : 'white',
+                    backgroundColor: preference === 'gold' ? '#ffd700' : '#cd7f32',
+                    color: preference === 'gold' ? 'black' : 'white',
                     borderRadius: '5px',
                     fontSize: '12px',
                     padding: '2px 8px'
                   }}
                 >
-                  <CheckCircleOutlined /> {franchise.sponsorStatus.charAt(0).toUpperCase() + franchise.sponsorStatus.slice(1)}
+                  <CheckCircleOutlined /> {preference.charAt(0).toUpperCase() + preference.slice(1)}
                 </Tag>
               </Tooltip>
-            )}
+            ))}
           </div>
         }
         description={(
@@ -135,7 +148,7 @@ function FranchiseCard({ franchise }) {
             </p>
             <p style={{ textAlign: 'left', color: 'black' }}>
               <EnvironmentOutlined /> {franchise.zipcode === '00000' ? 'International' : franchise.zipcode}
-              {franchise.investmentAmount && (
+              {franchise.investment_amount && (
                 <>
                   {" | "}
                   <DollarOutlined /> Investment:
@@ -189,6 +202,7 @@ function FranchiseCard({ franchise }) {
         )}
       />
     </Card>
+    </Badge.Ribbon>
   );
 }
 
