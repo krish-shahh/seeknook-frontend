@@ -17,7 +17,7 @@ const FranchisesList = () => {
     const [selectedFranchise, setSelectedFranchise] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [filterPreferences, setFilterPreferences] = useState([]);
-    const pageSize = 10;
+    const pageSize = 27;
 
     useEffect(() => {
         fetchFranchises();
