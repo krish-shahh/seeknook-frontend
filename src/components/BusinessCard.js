@@ -4,7 +4,7 @@ import {
   PhoneOutlined, MailOutlined, EnvironmentOutlined,
   InstagramOutlined, FacebookOutlined, HeartOutlined, HeartFilled,
   SafetyOutlined, TeamOutlined, LinkOutlined, CheckCircleOutlined,
-  CrownOutlined, CarOutlined, LikeOutlined, WhatsAppOutlined, SearchOutlined, LikeFilled, PaperClipOutlined
+  CrownOutlined, CarOutlined, LikeOutlined, WhatsAppOutlined, SearchOutlined, LikeFilled, PaperClipOutlined, ShareAltOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +29,36 @@ function BusinessCard({ business }) {
       window.open(`${baseURL}/${userHandle}`, '_blank');
     }
   };
+
+  const shareBusiness = () => {
+    const shareText = `
+      Check out this business on SeekNook:
+      
+      Name: ${business.name}
+      Description: ${business.description}
+      Phone: ${formatPhoneNumber(business.phone)}
+      Email: ${business.email}
+      Location: ${business.zipcode} ${business.city}
+      
+      Visit SeekNook for more details: ${window.location.href}
+    `;
+  
+    if (navigator.share) {
+      navigator.share({
+        title: business.name,
+        text: shareText,
+        url: window.location.href,
+      }).then(() => {
+        console.log('Thanks for sharing!');
+      }).catch((error) => {
+        console.error('Error sharing:', error);
+      });
+    } else {
+      // Fallback for browsers that do not support the Web Share API
+      const shareUrl = `mailto:?subject=${encodeURIComponent(business.name)}&body=${encodeURIComponent(shareText)}`;
+      window.location.href = shareUrl;
+    }
+  };  
 
   function formatPhoneNumber(phone) {
     const cleaned = ('' + phone).replace(/\D/g, '');
@@ -257,6 +287,13 @@ function BusinessCard({ business }) {
                       />
                     </Tooltip>
                   )}
+                </div>
+                <div>
+                  <Button
+                    shape="circle"
+                    icon={<ShareAltOutlined />}
+                    onClick={shareBusiness}
+                  />
                 </div>
                 <div>
                   <Button
