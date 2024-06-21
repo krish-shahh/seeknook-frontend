@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleAuthProvider, signInWithPopup, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 import { auth } from '../firebase-config';
-import { Button, Input, message, Form, Divider, Typography, Space } from 'antd';
-import { GoogleOutlined } from '@ant-design/icons';
+import { Button, Input, message, Form, Divider, Typography } from 'antd';
+import GoogleButton from 'react-google-button'; // Import the GoogleButton component
 
 const { Title, Text } = Typography;
 
@@ -12,13 +12,12 @@ function LoginPage() {
   const navigate = useNavigate();
 
   const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider(); // Create a new instance of the GoogleAuthProvider
+    const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider); // Attempt to sign in with the popup
-      // After successful sign-in:
-      navigate("/dashboard"); // Navigate to the success page
+      const result = await signInWithPopup(auth, provider);
+      navigate("/dashboard");
     } catch (error) {
-      console.error('Error signing in with Google:', error); // Handle errors here
+      console.error('Error signing in with Google:', error);
       alert("Failed to sign in with Google: " + error.message);
     }
   };
@@ -60,16 +59,17 @@ function LoginPage() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     checkEmailSignIn();
   }, []);
 
   return (
     <div className="login-container" style={{ maxWidth: '400px', margin: 'auto', padding: '20px', textAlign: 'center' }}>
       <Title level={2} className="mb-3">Login</Title>
-      <Button type="primary" icon={<GoogleOutlined />} onClick={signInWithGoogle} style={{ width: '100%', marginBottom: '20px' }}>
-        Sign In With Google
-      </Button>
+      <GoogleButton
+        onClick={signInWithGoogle}
+        style={{ width: '100%', marginBottom: '20px', borderRadius: '3px' }}
+      />
       <Divider>OR</Divider>
       <Form layout="vertical" style={{ textAlign: 'left' }}>
         <Form.Item>
