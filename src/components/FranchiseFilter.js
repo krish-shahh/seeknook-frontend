@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Space, Select, Button, Row, Switch } from 'antd';
+import { Input, Space, Button, Row, Switch } from 'antd';
+import Select from 'react-select';
 import axios from 'axios';
 
 const { Option } = Select;
@@ -73,23 +74,17 @@ const FranchiseFilter = ({
         style={{ border: '1px solid black' }}
       />
       <Select
-        allowClear
-        showSearch
+        isClearable
+        isSearchable
         placeholder={servicePlaceholder}
-        value={serviceType || undefined}
-        onChange={setServiceType}
-        onClear={() => setServiceType('')}
-        style={selectStyle}
-        filterOption={(input, option) =>
-          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-        }
-      >
-        {serviceOptions.map((service, index) => (
-          <Option key={index} value={service} style={optionStyle}>
-            {service}
-          </Option>
-        ))}
-      </Select>
+        value={serviceType ? { value: serviceType, label: serviceType } : null}
+        onChange={(selectedOption) => setServiceType(selectedOption ? selectedOption.value : '')}
+        options={serviceOptions.map((service, index) => ({
+          value: service,
+          label: service,
+        }))}
+        style={{ border: '1px solid black' }}
+      />
 
       <Row justify="space-between" align="middle">
         <Button onClick={resetAllFilters}>
