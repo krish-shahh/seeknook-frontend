@@ -4,7 +4,7 @@ import {
   PhoneOutlined, MailOutlined, EnvironmentOutlined,
   InstagramOutlined, FacebookOutlined, HeartOutlined, HeartFilled,
   DollarOutlined, LinkOutlined, CheckCircleOutlined,
-  LikeOutlined, WhatsAppOutlined, BookFilled, BookOutlined
+  LikeOutlined, WhatsAppOutlined, BookFilled, BookOutlined, ShareAltOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +16,17 @@ function FranchiseCard({ franchise }) {
   const [revealPhone, setRevealPhone] = useState(false);
   const [revealEmail, setRevealEmail] = useState(false);
   const navigate = useNavigate();
+
+  const investmentOptions = {
+    below_50k: 'Below $50K',
+    below_100k: 'Below $100K',
+    below_250k: 'Below $250K',
+    below_350k: 'Below $350K',
+    below_500k: 'Below $500K',
+    below_750k: 'Below $750K',
+    below_1m: 'Below $1M',
+    over_1m: 'Over $1M'
+  };
 
   const openSocialMedia = (baseURL, userHandle) => {
     if (userHandle) {
@@ -33,6 +44,37 @@ function FranchiseCard({ franchise }) {
     }
     return phone;
   };
+
+  const shareFranchise = () => {
+    const shareText = `
+      Check out this franchise on SeekNook:
+      
+      Name: ${franchise.name}
+      Description: ${franchise.description}
+      Phone: ${formatPhoneNumber(franchise.phone)}
+      Email: ${franchise.email}
+      Investment Amount: ${investmentOptions[franchise.investment_amount]}
+      Location: ${franchise.zipcode === '00000' ? 'International' : franchise.zipcode}
+      
+      Visit SeekNook for more details: ${window.location.href}
+    `;
+  
+    if (navigator.share) {
+      navigator.share({
+        title: franchise.name,
+        text: shareText,
+        url: window.location.href,
+      }).then(() => {
+        console.log('Thanks for sharing!');
+      }).catch((error) => {
+        console.error('Error sharing:', error);
+      });
+    } else {
+      // Fallback for browsers that do not support the Web Share API
+      const shareUrl = `mailto:?subject=${encodeURIComponent(franchise.name)}&body=${encodeURIComponent(shareText)}`;
+      window.location.href = shareUrl;
+    }
+  };  
 
   const toggleLike = async () => {
     const newLiked = !liked;
@@ -71,17 +113,6 @@ function FranchiseCard({ franchise }) {
 
   const handleRevealEmail = () => {
     setRevealEmail(true);
-  };
-
-  const investmentOptions = {
-    below_50k: 'Below 50K',
-    below_100k: 'Below 100K',
-    below_250k: 'Below 250K',
-    below_350k: 'Below 350K',
-    below_500k: 'Below 500K',
-    below_750k: 'Below 750K',
-    below_1m: 'Below 1M',
-    over_1m: 'Over 1M'
   };
 
   const isNewFranchise = () => {
@@ -189,6 +220,13 @@ function FranchiseCard({ franchise }) {
                   </Tooltip>
                 )}
               </div>
+              <div>
+                  <Button
+                    shape="circle"
+                    icon={<ShareAltOutlined />}
+                    onClick={shareFranchise}
+                  />
+                </div>
               <div>
                 <Button
                   shape="circle"
