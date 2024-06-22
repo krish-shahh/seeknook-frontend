@@ -3,8 +3,6 @@ import { Input, Space, Button, Row, Switch } from 'antd';
 import Select from 'react-select';
 import axios from 'axios';
 
-const { Option } = Select;
-
 const ServiceFilter = ({
   searchTerm, setSearchTerm, filterZip, setFilterZip, serviceType, setServiceType,
   handleSearch, viewType, setViewType, filterPreferences, setFilterPreferences
@@ -37,8 +35,16 @@ const ServiceFilter = ({
     setServicePlaceholder("Filter by Service Type");
   };
 
-  const handlePreferenceChange = (value) => {
-    setFilterPreferences([value]);
+  const additionalFiltersOptions = [
+    { value: 'groupDiscount', label: 'Group Discount' },
+    { value: 'licensedInsured', label: 'Licensed & Insured' },
+    { value: 'deliver', label: 'Delivers' },
+    { value: 'hiring', label: 'Hiring' },
+  ];
+  
+  const handlePreferenceChange = (selectedOption) => {
+    const selectedValue = selectedOption ? selectedOption.value : '';
+    setFilterPreferences(selectedValue ? [selectedValue] : []);
   };
 
   return (
@@ -71,7 +77,12 @@ const ServiceFilter = ({
           value: service,
           label: service,
         }))}
-        style={{ border: '1px solid black' }}
+        styles={{
+          control: (base) => ({
+            ...base,
+            border: '1px solid black',
+          }),
+        }}
       />
 
       <Row justify="space-between" align="middle">
@@ -91,20 +102,19 @@ const ServiceFilter = ({
         </Space>
         <Select
           placeholder="Additional Filters"
-          value={filterPreferences[0] || undefined}
+          value={additionalFiltersOptions.find(option => filterPreferences.includes(option.value)) || null}
           onChange={handlePreferenceChange}
-          style={{
-            width: 'auto', // Adjust width automatically based on content
-            minWidth: '160px', // Optional: Set a minimum width to ensure it doesn't get too small
-            whiteSpace: 'normal',
-            wordWrap: 'break-word',
+          options={additionalFiltersOptions}
+          isClearable
+          styles={{
+            control: (base) => ({
+              ...base,
+              minWidth: '160px',
+              whiteSpace: 'normal',
+              wordWrap: 'break-word',
+            }),
           }}
-        >
-          <Option value="groupDiscount">Group Discount</Option>
-          <Option value="licensedInsured">Licensed & Insured</Option>
-          <Option value="deliver">Delivers</Option>
-          <Option value="hiring">Hiring</Option>
-        </Select>
+        />
       </Row>
     </Space>
   );
