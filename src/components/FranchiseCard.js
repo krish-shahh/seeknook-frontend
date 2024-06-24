@@ -132,21 +132,23 @@ function FranchiseCard({ franchise }) {
               {franchise.name}
             </span>
             {franchise.payment_preferences && franchise.payment_preferences.map((preference, index) => (
-              <Tooltip key={index} title={`${preference.charAt(0).toUpperCase() + preference.slice(1)} Sponsor`}>
-                <Tag
-                  color={preference === 'gold' ? 'gold' : 'bronze'}
-                  style={{
-                    fontWeight: 'bold',
-                    backgroundColor: preference === 'gold' ? '#ffd700' : '#cd7f32',
-                    color: preference === 'gold' ? 'black' : 'white',
-                    borderRadius: '5px',
-                    fontSize: '12px',
-                    padding: '2px 8px'
-                  }}
-                >
-                  <CheckCircleOutlined /> {preference.charAt(0).toUpperCase() + preference.slice(1)}
-                </Tag>
-              </Tooltip>
+              preference !== 'basic' && (
+                <Tooltip key={index} title={`${preference.charAt(0).toUpperCase() + preference.slice(1)} Sponsor`}>
+                  <Tag
+                    color={preference === 'gold' ? 'gold' : 'bronze'}
+                    style={{
+                      fontWeight: 'bold',
+                      backgroundColor: preference === 'gold' ? '#ffd700' : '#cd7f32',
+                      color: preference === 'gold' ? 'black' : 'white',
+                      borderRadius: '5px',
+                      fontSize: '12px',
+                      padding: '2px 8px'
+                    }}
+                  >
+                    <CheckCircleOutlined /> {preference.charAt(0).toUpperCase() + preference.slice(1)}
+                  </Tag>
+                </Tooltip>
+              )
             ))}
           </div>
         }
