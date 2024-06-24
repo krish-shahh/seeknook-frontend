@@ -359,7 +359,7 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
             </Select>
           </Form.Item>
 
-          <Form.Item name="business_type" label="" rules={[{ message: 'Please select your business type(s)!' }]}>
+          <Form.Item name="business_type" label="">
             <Checkbox.Group style={{ width: '100%' }}>
               <Row gutter={[8, 8]}>
                 <Col xs={24} sm={12} md={8}><Checkbox value="residential">Residential</Checkbox></Col>
