@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleAuthProvider, signInWithPopup, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+import axios from 'axios';
+import { GoogleAuthProvider, signInWithPopup, signInWithCustomToken } from 'firebase/auth';
 import { auth } from '../firebase-config';
 import { Button, Input, message, Form, Divider, Typography } from 'antd';
-import GoogleButton from 'react-google-button'; // Import the GoogleButton component
+import GoogleButton from 'react-google-button';
+import OTPInput from 'react-otp-input';
 
 const { Title, Text } = Typography;
 
 function LoginPage() {
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
   const navigate = useNavigate();
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
+      await signInWithPopup(auth, provider);
       navigate("/dashboard");
     } catch (error) {
       console.error('Error signing in with Google:', error);
@@ -26,42 +30,35 @@ function LoginPage() {
     setEmail(e.target.value);
   };
 
-  const sendSignInLink = async () => {
-    const actionCodeSettings = {
-      url: window.location.href,
-      handleCodeInApp: true,
-    };
+  const handleOtpChange = (otp) => {
+    setOtp(otp);
+  };
 
+  const sendOtp = async () => {
     try {
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      window.localStorage.setItem('emailForSignIn', email);
-      message.success('Sign-in link sent to your email.');
+      await axios.post('https://seeknook-backend-2564a672bd98.herokuapp.com/api/otp/send-otp', { email });
+      setIsOtpSent(true);
+      message.success('OTP sent to your email.');
     } catch (error) {
-      console.error('Error sending email sign-in link:', error);
-      alert('Failed to send email sign-in link: ' + error.message);
+      console.error('Error sending OTP:', error);
+      alert('Failed to send OTP: ' + error.message);
     }
   };
 
-  const checkEmailSignIn = async () => {
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      let email = window.localStorage.getItem('emailForSignIn');
-      if (!email) {
-        email = window.prompt('Please provide your email for confirmation');
-      }
-      try {
-        await signInWithEmailLink(auth, email, window.location.href);
-        window.localStorage.removeItem('emailForSignIn');
-        navigate("/dashboard");
-      } catch (error) {
-        console.error('Error signing in with email link:', error);
-        alert('Failed to sign in with email link: ' + error.message);
-      }
+  const verifyOtp = async () => {
+    try {
+      const response = await axios.post('https://seeknook-backend-2564a672bd98.herokuapp.com/api/otp/verify-otp', { email, otp });
+      const { token } = response.data;
+      //console.log('Received custom token:', token); // Debugging line
+
+      // Sign in the user with the custom token
+      await signInWithCustomToken(auth, token);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      alert('Failed to verify OTP: ' + error.message);
     }
   };
-
-  useEffect(() => {
-    checkEmailSignIn();
-  }, []);
 
   return (
     <div className="login-container" style={{ maxWidth: '400px', margin: 'auto', padding: '20px', textAlign: 'center' }}>
@@ -80,13 +77,43 @@ function LoginPage() {
             placeholder="Enter your email"
           />
         </Form.Item>
+        {isOtpSent && (
+          <Form.Item>
+            <OTPInput
+              value={otp}
+              onChange={handleOtpChange}
+              numInputs={6}
+              renderInput={(props) => <input {...props} />}
+              separator={<span>-</span>}
+              isInputNum
+              shouldAutoFocus
+              containerStyle={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+              inputStyle={{
+                width: '40px',
+                height: '40px',
+                margin: '0 5px',
+                fontSize: '20px',
+                borderRadius: '4px',
+                border: '1px solid rgba(0,0,0,0.3)',
+                textAlign: 'center'
+              }}
+            />
+          </Form.Item>
+        )}
         <Form.Item>
-          <Button type="primary" onClick={sendSignInLink} style={{ width: '100%' }}>
-            Send Sign-In Link
+          <Button
+            type="primary"
+            onClick={isOtpSent ? verifyOtp : sendOtp}
+            style={{ width: '100%' }}
+          >
+            {isOtpSent ? 'Verify OTP' : 'Send OTP'}
           </Button>
         </Form.Item>
       </Form>
-      <Text type="secondary">We'll send a sign-in link to your email</Text>
+      <Text type="secondary">We'll send a sign-in OTP to your email</Text>
     </div>
   );
 }

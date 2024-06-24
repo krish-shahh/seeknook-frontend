@@ -7,6 +7,7 @@ import { Spin } from 'antd';
 import './App.css'; // Import the CSS file
 import RegistrationPage from './pages/RegistrationPage';
 import ContactUs from './pages/ContactUs';
+import MagicSignIn from './components/MagicSignIn';
 
 // Lazy load components
 const LoginPage = lazy(() => import('./pages/LoginPage'));
@@ -55,6 +56,7 @@ const App = () => {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/avoid-scams" element={<AvoidScams />} />
           <Route path='/contact-us' element={<ContactUs />} />
+          <Route path="/magic-sign-in" element={<MagicSignIn />} />
         </Routes>
       </Suspense>
     </Router>
