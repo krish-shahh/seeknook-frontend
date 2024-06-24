@@ -140,7 +140,7 @@ function BusinessCard({ business }) {
               <span style={{ fontWeight: 'bold', color: 'black', whiteSpace: 'normal' }}>
                 {business.name}
               </span>
-              {business.payment_preferences && (
+              {business.payment_preferences && business.payment_preferences !== 'basic' && (
                 <Tooltip title={`${business.payment_preferences.charAt(0).toUpperCase() + business.payment_preferences.slice(1)} Sponsor`}>
                   <Tag
                     color={business.payment_preferences === 'gold' ? 'gold' : 'bronze'}
