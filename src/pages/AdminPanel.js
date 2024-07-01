@@ -332,6 +332,12 @@ const AdminPanel = () => {
       )
     },
     {
+      title: 'Paid Status',
+      dataIndex: 'paid',
+      key: 'paid',
+      render: (paid) => (paid ? 'True' : 'False')
+    },     
+    {
       title: 'Action',
       key: 'action',
       render: (_, record) => (

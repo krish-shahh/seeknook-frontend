@@ -5,8 +5,6 @@ import Navbar from './components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Spin } from 'antd';
 import './App.css'; // Import the CSS file
-import RegistrationPage from './pages/RegistrationPage';
-import ContactUs from './pages/ContactUs';
 import MagicSignIn from './components/MagicSignIn';
 
 // Lazy load components
@@ -26,6 +24,7 @@ const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const TermsOfUse = lazy(() => import('./components/policy/TermsOfUse'));
 const PrivacyPolicy = lazy(() => import('./components/policy/PrivacyPolicy'));
 const AvoidScams = lazy(() => import('./components/policy/AvoidScams'));
+const ContactUs = lazy(() => import('./pages/ContactUs'));
 
 const App = () => {
   return (
@@ -43,7 +42,6 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<HomePage />} />
           <Route path='/success' element={<SuccessPage />} />
-          <Route path='register' element={<RegistrationPage />} />
           <Route path="/event-list" element={<EventList />} />
           <Route path="/business-list" element={<BusinessList />} />
           <Route path="/franchises-list" element={<FranchiseList />} />

@@ -18,10 +18,12 @@ const CreateFranchiseOpportunity = ({ initialValues, onCancel, onSuccess, onSave
   const [uid, setUid] = useState('');
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('card'); // Default payment method
+  const [paid, setPaid] = useState(false);
   const isEditing = initialValues !== null;
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const paymentFormRef = useRef(null);
-  const [listingData, setListingData] = useState([]);
+  const [listingData, setListingData] = useState({});
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
@@ -100,6 +102,11 @@ const CreateFranchiseOpportunity = ({ initialValues, onCancel, onSuccess, onSave
     }
   };
 
+  const handlePaymentMethodSelection = (method) => {
+    setPaymentMethod(method);
+    setPaid(method === 'card');
+  };
+
   const handlePaymentSuccess = async (nonce) => {
     try {
       const response = await axios.post('https://seeknook-backend-2564a672bd98.herokuapp.com/api/payment/create-payment', {
@@ -112,7 +119,7 @@ const CreateFranchiseOpportunity = ({ initialValues, onCancel, onSuccess, onSave
       if (response.status === 200) {
         message.success('Payment successful!');
         setIsPaymentModalVisible(false);
-        submitListing({ ...listingData, payment_preferences: [selectedPlan], payment_id: response.data.paymentId });
+        submitListing({ ...listingData, payment_preferences: selectedPlan, payment_id: response.data.paymentId, paid: true });
       } else {
         message.error('Payment failed. Please try again.');
       }
@@ -121,7 +128,8 @@ const CreateFranchiseOpportunity = ({ initialValues, onCancel, onSuccess, onSave
     }
   };
 
-  const submitListing = async (values) => {
+  const submitListing = async () => {
+    const values = listingData;
     const filteredValues = Object.entries(values).reduce((acc, [key, value]) => {
       if (value !== undefined) {
         acc[key] = value;
@@ -130,16 +138,23 @@ const CreateFranchiseOpportunity = ({ initialValues, onCancel, onSuccess, onSave
     }, {});
 
     try {
-      await axios.post('https://seeknook-backend-2564a672bd98.herokuapp.com/api/franchises', {
+      const payload = {
         ...filteredValues,
         created_at: new Date().toISOString(),
         status: 'pending',
         useruid: auth.currentUser.uid,
         likes: 0,
-      });
+        payment_preferences: [selectedPlan], // Keep payment_preferences as a string
+        paid: paid, // Set paid based on payment method
+      };
+
+      console.log('Payload:', payload); // Log the payload to verify values
+
+      await axios.post('https://seeknook-backend-2564a672bd98.herokuapp.com/api/franchises', payload);
       form.resetFields();
       form.setFieldsValue({ email, uid });
       onSuccess('Franchise Listing');
+      setIsPaymentModalVisible(false);
     } catch (error) {
       console.error('Error adding document: ', error);
       message.error('Failed to submit listing. Please try again.');
@@ -319,11 +334,24 @@ const CreateFranchiseOpportunity = ({ initialValues, onCancel, onSuccess, onSave
               <Option value="gold">Gold ($2500/year)</Option>
             </Select>
           </Form.Item>
-          <SquarePaymentFormComponent
-            ref={paymentFormRef}
-            onPaymentSuccess={handlePaymentSuccess}
-            onPaymentError={(error) => message.error(`Payment failed: ${error.message}`)}
-          />
+          <Form.Item name="paymentMethod" label="Payment Method" rules={[{ required: true, message: 'Please select a payment method!' }]}>
+            <Select placeholder="Select Payment Method" onChange={handlePaymentMethodSelection} style={{ width: '100%', marginBottom: '20px' }}>
+              <Option value="card">Card Payment</Option>
+              <Option value="cash">Cash Payment</Option>
+              <Option value="check">Check Payment</Option>
+            </Select>
+          </Form.Item>
+          {paymentMethod === 'card' ? (
+            <SquarePaymentFormComponent
+              ref={paymentFormRef}
+              onPaymentSuccess={handlePaymentSuccess}
+              onPaymentError={(error) => message.error(`Payment failed: ${error.message}`)}
+            />
+          ) : (
+            <div>
+              <Button type="primary" onClick={submitListing}>Submit Listing</Button>
+            </div>
+          )}
         </Modal>
       )}
     </>

@@ -27,6 +27,9 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
   const isEditing = initialValues !== null;
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const paymentFormRef = useRef(null);
+  const [paid, setPaid] = useState(false);
+  const [showCashCheckOptions, setShowCashCheckOptions] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('card');
 
   // Load zip code data
   useEffect(() => {
@@ -102,9 +105,9 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
         }
         return acc;
       }, {});
-
+  
       const additionalData = zipCodeDetails[filteredValues.zipcode];
-
+  
       if (additionalData) {
         filteredValues.city = additionalData.city;
         filteredValues.state_id = additionalData.state_id;
@@ -112,7 +115,7 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
         filteredValues.lng = additionalData.lng;
         filteredValues.county_name = additionalData.county_name;
       }
-
+  
       try {
         await axios.put(`https://seeknook-backend-2564a672bd98.herokuapp.com/api/businesses/${initialValues.uuid}`, {
           ...filteredValues,
@@ -126,9 +129,15 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
     } else {
       const formValues = form.getFieldsValue();
       setListingData(formValues);
+  
+      // Handle business_type as an empty array if nothing is selected
+      if (!formValues.business_type) {
+        formValues.business_type = [];
+      }
+  
       setIsPaymentModalVisible(true);
     }
-  };
+  };  
 
   // Handle plan selection
   const handlePlanSelection = (plan) => {
@@ -148,7 +157,20 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
         break;
     }
   };
-
+  
+  const handlePaymentMethodSelection = (method) => {
+    setPaymentMethod(method);
+    if (method === 'cash') {
+      setPaid(false);
+      message.info('For cash payments, please contact our support team.');
+    } else if (method === 'check') {
+      setPaid(false);
+      message.info('For check payments, please contact our support team.');
+    } else {
+      setPaid(true);
+    }
+  };
+  
   // Handle payment success
   const handlePaymentSuccess = async (nonce) => {
     try {
@@ -172,16 +194,17 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
   };
 
   // Submit listing to the backend
-  const submitListing = async (values) => {
+  const submitListing = async () => {
+    const values = listingData;
     const filteredValues = Object.entries(values).reduce((acc, [key, value]) => {
       if (value !== undefined) {
         acc[key] = value;
       }
       return acc;
     }, {});
-
+  
     const additionalData = zipCodeDetails[filteredValues.zipcode];
-
+  
     if (additionalData) {
       filteredValues.city = additionalData.city;
       filteredValues.state_id = additionalData.state_id;
@@ -189,23 +212,33 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
       filteredValues.lng = additionalData.lng;
       filteredValues.county_name = additionalData.county_name;
     }
-
+  
+    // Ensure business_type is an array
+    if (!filteredValues.business_type) {
+      filteredValues.business_type = [];
+    }
+  
+    const payload = {
+      ...filteredValues,
+      created_at: new Date().toISOString(),
+      status: 'pending',
+      useruid: auth.currentUser.uid,
+      likes: 0,
+      payment_preferences: selectedPlan,
+      paid: paymentMethod === 'card',
+    };
+    
     try {
-      await axios.post('https://seeknook-backend-2564a672bd98.herokuapp.com/api/businesses', {
-        ...filteredValues,
-        created_at: new Date().toISOString(),
-        status: 'pending',
-        useruid: auth.currentUser.uid,
-        likes: 0,
-      });
+      await axios.post('https://seeknook-backend-2564a672bd98.herokuapp.com/api/businesses', payload);
       form.resetFields();
       form.setFieldsValue({ email, uid });
       onSuccess('Business Listing');
+      setIsPaymentModalVisible(false);
     } catch (error) {
-      console.error('Error adding document: ', error);
+      console.error('Error adding document:', error);
       message.error('Failed to submit listing. Please try again.');
     }
-  };
+  };  
 
   // Handle description change
   const onDescriptionChange = (e) => {
@@ -231,7 +264,7 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
     if (details) {
       form.setFieldsValue({ city: details.city, state_id: details.state_id });
       setZipCodeDetails(details);
-
+  
       const state = details.state_id;
       const city = details.city;
       setServiceAreaOptions([
@@ -243,10 +276,17 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
         { label: `North ${state}`, value: `north_${state.toLowerCase()}` },
         { label: 'Anywhere Remotely', value: 'anywhere_remotely' },
       ]);
+  
+      if (e.target.value === '08515') {
+        setShowCashCheckOptions(true);
+      } else {
+        setShowCashCheckOptions(false);
+      }
     } else {
       setServiceAreaOptions([]);
+      setShowCashCheckOptions(false);
     }
-  };
+  };  
 
   return (
     <>
@@ -388,24 +428,41 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
 
       {!isEditing && (
         <Modal
-          title="Choose Your Plan"
-          visible={isPaymentModalVisible}
-          onCancel={() => setIsPaymentModalVisible(false)}
-          footer={null} // Remove cancel and OK buttons
-        >
-          <Form.Item name="plan" label="Plan" rules={[{ required: true, message: 'Please select a plan!' }]}>
-            <Select placeholder="Select Plan" onChange={handlePlanSelection} style={{ width: '100%', marginBottom: '20px' }}>
-              <Option value="basic">Basic ($250/year)</Option>
-              <Option value="bronze">Bronze ($500/year)</Option>
-              <Option value="gold">Gold ($1000/year)</Option>
+        title="Choose Your Plan"
+        visible={isPaymentModalVisible}
+        onCancel={() => setIsPaymentModalVisible(false)}
+        footer={null} // Remove cancel and OK buttons
+      >
+        <Form.Item name="plan" label="Plan" rules={[{ required: true, message: 'Please select a plan!' }]}>
+          <Select placeholder="Select Plan" onChange={handlePlanSelection} style={{ width: '100%', marginBottom: '20px' }}>
+            <Option value="basic">Basic ($250/year)</Option>
+            <Option value="bronze">Bronze ($500/year)</Option>
+            <Option value="gold">Gold ($1000/year)</Option>
+          </Select>
+        </Form.Item>
+        
+        {showCashCheckOptions && (
+          <Form.Item name="paymentMethod" label="Payment Method" rules={[{ required: true, message: 'Please select a payment method!' }]}>
+            <Select placeholder="Select Payment Method" onChange={handlePaymentMethodSelection} style={{ width: '100%', marginBottom: '20px' }}>
+              <Option value="card">Card Payment</Option>
+              <Option value="cash">Cash Payment</Option>
+              <Option value="check">Check Payment</Option>
             </Select>
           </Form.Item>
+        )}
+      
+        {paymentMethod === 'card' ? (
           <SquarePaymentFormComponent
             ref={paymentFormRef}
             onPaymentSuccess={handlePaymentSuccess}
             onPaymentError={(error) => message.error(`Payment failed: ${error.message}`)}
           />
-        </Modal>
+        ) : (
+          <div>
+            <Button type="primary" onClick={submitListing}>Submit Listing</Button>
+          </div>
+        )}
+      </Modal>                             
       )}
     </>
   );
