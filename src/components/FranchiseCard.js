@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Card, Button, Tooltip, Tag, Badge } from 'antd';
+import { Card, Button, Tooltip, Tag, Badge, Typography } from 'antd';
 import {
   PhoneOutlined, MailOutlined, EnvironmentOutlined,
-  InstagramOutlined, FacebookOutlined, HeartOutlined, HeartFilled,
-  DollarOutlined, LinkOutlined, CheckCircleOutlined,
-  LikeOutlined, WhatsAppOutlined, BookFilled, BookOutlined, ShareAltOutlined
+  InstagramOutlined, FacebookOutlined, DollarOutlined, LinkOutlined, CheckCircleOutlined,
+  LikeOutlined, WhatsAppOutlined, ShareAltOutlined, UpOutlined, DownOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+const { Paragraph } = Typography;
+const MAX_DESCRIPTION_LENGTH = 100;
 
 function FranchiseCard({ franchise }) {
   const [liked, setLiked] = useState(false);
@@ -15,6 +17,7 @@ function FranchiseCard({ franchise }) {
   const [likesCount, setLikesCount] = useState(franchise.likes || 0);
   const [revealPhone, setRevealPhone] = useState(false);
   const [revealEmail, setRevealEmail] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
   const navigate = useNavigate();
 
   const investmentOptions = {
@@ -74,7 +77,7 @@ function FranchiseCard({ franchise }) {
       const shareUrl = `mailto:?subject=${encodeURIComponent(franchise.name)}&body=${encodeURIComponent(shareText)}`;
       window.location.href = shareUrl;
     }
-  };  
+  };
 
   const toggleLike = async () => {
     const newLiked = !liked;
@@ -105,7 +108,7 @@ function FranchiseCard({ franchise }) {
     }
   
     return '#ddd';
-  };  
+  };
 
   const handleRevealPhone = () => {
     setRevealPhone(true);
@@ -122,126 +125,160 @@ function FranchiseCard({ franchise }) {
     return timeDifference <= 24 * 60 * 60 * 1000; // 24 hours in milliseconds
   };
 
+  const renderDescription = () => {
+    if (showFullDescription) {
+      return (
+        <>
+          <Paragraph style={{ marginTop: '10px', textAlign: 'left', color: 'black', whiteSpace: 'normal' }}>
+            {franchise.description}
+          </Paragraph>
+          <Button type="link" onClick={() => setShowFullDescription(false)} style={{ padding: 0, height: 'auto', marginTop: '-10px' }}>
+            <UpOutlined />
+          </Button>
+        </>
+      );
+    }
+
+    if (franchise.description.length > MAX_DESCRIPTION_LENGTH) {
+      return (
+        <>
+          <Paragraph style={{ marginTop: '10px', textAlign: 'left', color: 'black', whiteSpace: 'normal' }}>
+            {`${franchise.description.substring(0, MAX_DESCRIPTION_LENGTH)}`}
+            <Button type="link" onClick={() => setShowFullDescription(true)} style={{ padding: 0, height: 'auto', color: 'inherit' }}>
+              <DownOutlined />
+            </Button>
+          </Paragraph>
+        </>
+      );
+    }
+
+    return (
+      <Paragraph style={{ marginTop: '10px', textAlign: 'left', color: 'black', whiteSpace: 'normal' }}>
+        {franchise.description}
+      </Paragraph>
+    );
+  };
+
   return (
     <Badge.Ribbon text="New" color="gray" style={{ display: isNewFranchise() ? 'inline-block' : 'none' }}>
-    <Card style={{ marginTop: '20px', border: `1px solid ${getBorderColor()}`, borderRadius: '5px', width: '100%', color: 'black' }}>
-      <Card.Meta
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold', color: 'black', whiteSpace: 'normal' }}>
-              {franchise.name}
-            </span>
-            {franchise.payment_preferences && franchise.payment_preferences.map((preference, index) => (
-              preference !== 'basic' && (
-                <Tooltip key={index} title={`${preference.charAt(0).toUpperCase() + preference.slice(1)} Sponsor`}>
-                  <Tag
-                    color={preference === 'gold' ? 'gold' : 'bronze'}
-                    style={{
-                      fontWeight: 'bold',
-                      backgroundColor: preference === 'gold' ? '#ffd700' : '#cd7f32',
-                      color: preference === 'gold' ? 'black' : 'white',
-                      borderRadius: '5px',
-                      fontSize: '12px',
-                      padding: '2px 8px'
-                    }}
-                  >
-                    <CheckCircleOutlined /> {preference.charAt(0).toUpperCase() + preference.slice(1)}
-                  </Tag>
-                </Tooltip>
-              )
-            ))}
-          </div>
-        }
-        description={(
-          <>
-            <div style={{ textAlign: 'left', color: 'grey', fontStyle: 'italic', whiteSpace: 'normal' }}>
-              {Array.isArray(franchise.service_type) ? franchise.service_type.join(", ") : franchise.service_type}
+      <Card style={{ marginTop: '20px', border: `1px solid ${getBorderColor()}`, borderRadius: '5px', width: '100%', color: 'black' }}>
+        <Card.Meta
+          title={
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 'bold', color: 'black', whiteSpace: 'normal' }}>
+                {franchise.name}
+              </span>
+              {franchise.payment_preferences && franchise.payment_preferences.map((preference, index) => (
+                preference !== 'basic' && (
+                  <Tooltip key={index} title={`${preference.charAt(0).toUpperCase() + preference.slice(1)} Sponsor`}>
+                    <Tag
+                      color={preference === 'gold' ? 'gold' : 'bronze'}
+                      style={{
+                        fontWeight: 'bold',
+                        backgroundColor: preference === 'gold' ? '#ffd700' : '#cd7f32',
+                        color: preference === 'gold' ? 'black' : 'white',
+                        borderRadius: '5px',
+                        fontSize: '12px',
+                        padding: '2px 8px'
+                      }}
+                    >
+                      <CheckCircleOutlined /> {preference.charAt(0).toUpperCase() + preference.slice(1)}
+                    </Tag>
+                  </Tooltip>
+                )
+              ))}
             </div>
-            <p style={{ marginTop: '10px', textAlign: 'left', color: 'black', whiteSpace: 'normal' }}>{franchise.description}</p>
-            <p style={{ textAlign: 'left', color: 'black' }}>
-              {franchise.phone && franchise.display_preferences.includes("phone") && !revealPhone && (
-                <Button onClick={handleRevealPhone} icon={<PhoneOutlined />}>Show Phone</Button>
-              )}
-              {revealPhone && (
-                <>
-                  <PhoneOutlined /> <a href={`tel:${franchise.phone}`} style={{ color: 'inherit' }}>{formatPhoneNumber(franchise.phone)}</a>
-                </>
-              )}
-              {franchise.phone && franchise.email && franchise.display_preferences.includes("phone") && franchise.display_preferences.includes("email") && (
-                <> | </>
-              )}
-              {franchise.email && franchise.display_preferences.includes("email") && !revealEmail && (
-                <Button onClick={handleRevealEmail} icon={<MailOutlined />}>Show Email</Button>
-              )}
-              {revealEmail && (
-                <>
-                  <MailOutlined /> <a href={`mailto:${franchise.email}`} style={{ color: 'inherit' }}>{franchise.email}</a>
-                </>
-              )}
-            </p>
-            <p style={{ textAlign: 'left', color: 'black' }}>
-              <EnvironmentOutlined /> {franchise.zipcode === '00000' ? 'International' : franchise.zipcode}
-              {franchise.investment_amount && (
-                <>
-                  {" | "}
-                  <DollarOutlined /> Investment:
-                  <Tag color="green" style={{ marginLeft: 5, color: 'black' }}>
-                    {investmentOptions[franchise.investment_amount]}
-                  </Tag>
-                </>
-              )}
-            </p>
-            {franchise.website && (
-              <p style={{ textAlign: 'left', color: 'black' }}><LinkOutlined /> <a href={franchise.website} target="_blank" rel="noopener noreferrer">Visit Website</a></p>
-            )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
-              <div>
-                {franchise.instagram && (
-                  <Button
-                    shape="circle"
-                    style={{ marginRight: '5px' }}
-                    icon={<InstagramOutlined />}
-                    onClick={() => openSocialMedia('https://instagram.com', franchise.instagram)}
-                  />
+          }
+          description={(
+            <>
+              <div style={{ textAlign: 'left', color: 'grey', fontStyle: 'italic', whiteSpace: 'normal' }}>
+                {Array.isArray(franchise.service_type) ? franchise.service_type.join(", ") : franchise.service_type}
+              </div>
+              {renderDescription()}
+              <p style={{ textAlign: 'left', color: 'black' }}>
+                {franchise.phone && franchise.display_preferences.includes("phone") && !revealPhone && (
+                  <Button onClick={handleRevealPhone} icon={<PhoneOutlined />}>Show Phone</Button>
                 )}
-                {franchise.facebook && (
-                  <Button
-                    shape="circle"
-                    style={{ marginRight: '5px' }}
-                    icon={<FacebookOutlined />}
-                    onClick={() => openSocialMedia('https://facebook.com', franchise.facebook)}
-                  />
+                {revealPhone && (
+                  <>
+                    <PhoneOutlined /> <a href={`tel:${franchise.phone}`} style={{ color: 'inherit' }}>{formatPhoneNumber(franchise.phone)}</a>
+                  </>
                 )}
-                {franchise.whatsapp && (
-                  <Tooltip title="WhatsApp Group Link">
+                {franchise.phone && franchise.email && franchise.display_preferences.includes("phone") && franchise.display_preferences.includes("email") && (
+                  <> | </>
+                )}
+                {franchise.email && franchise.display_preferences.includes("email") && !revealEmail && (
+                  <Button onClick={handleRevealEmail} icon={<MailOutlined />}>Show Email</Button>
+                )}
+                {revealEmail && (
+                  <>
+                    <MailOutlined /> <a href={`mailto:${franchise.email}`} style={{ color: 'inherit' }}>{franchise.email}</a>
+                  </>
+                )}
+              </p>
+              <p style={{ textAlign: 'left', color: 'black' }}>
+                <EnvironmentOutlined /> {franchise.zipcode === '00000' ? 'International' : franchise.zipcode}
+                {franchise.investment_amount && (
+                  <>
+                    {" | "}
+                    <DollarOutlined /> Investment:
+                    <Tag color="green" style={{ marginLeft: 5, color: 'black' }}>
+                      {investmentOptions[franchise.investment_amount]}
+                    </Tag>
+                  </>
+                )}
+              </p>
+              {franchise.website && (
+                <p style={{ textAlign: 'left', color: 'black' }}><LinkOutlined /> <a href={franchise.website} target="_blank" rel="noopener noreferrer">Visit Website</a></p>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
+                <div>
+                  {franchise.instagram && (
                     <Button
                       shape="circle"
-                      icon={<WhatsAppOutlined />}
-                      onClick={() => window.open(franchise.whatsapp, '_blank')}
+                      style={{ marginRight: '5px' }}
+                      icon={<InstagramOutlined />}
+                      onClick={() => openSocialMedia('https://instagram.com', franchise.instagram)}
                     />
-                  </Tooltip>
-                )}
-              </div>
-              <div>
+                  )}
+                  {franchise.facebook && (
+                    <Button
+                      shape="circle"
+                      style={{ marginRight: '5px' }}
+                      icon={<FacebookOutlined />}
+                      onClick={() => openSocialMedia('https://facebook.com', franchise.facebook)}
+                    />
+                  )}
+                  {franchise.whatsapp && (
+                    <Tooltip title="WhatsApp Group Link">
+                      <Button
+                        shape="circle"
+                        icon={<WhatsAppOutlined />}
+                        onClick={() => window.open(franchise.whatsapp, '_blank')}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+                <div>
                   <Button
                     shape="circle"
                     icon={<ShareAltOutlined />}
                     onClick={shareFranchise}
                   />
                 </div>
-              <div>
-                <Button
-                  shape="circle"
-                  icon={<LikeOutlined />}
-                  onClick={toggleLike}
-                />
-                <span style={{ marginLeft: '8px' }}>{likesCount}</span>
+                <div>
+                  <Button
+                    shape="circle"
+                    icon={liked ? <LikeOutlined /> : <LikeOutlined />}
+                    onClick={toggleLike}
+                  />
+                  <span style={{ marginLeft: '8px' }}>{likesCount}</span>
+                </div>
               </div>
-            </div>
-          </>
-        )}
-      />
-    </Card>
+            </>
+          )}
+        />
+      </Card>
     </Badge.Ribbon>
   );
 }

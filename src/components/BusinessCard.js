@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Tooltip, Tag, Badge } from 'antd';
+import { Card, Button, Tooltip, Tag, Badge, Space, Typography } from 'antd';
 import {
   PhoneOutlined, MailOutlined, EnvironmentOutlined,
   InstagramOutlined, FacebookOutlined, HeartOutlined, HeartFilled,
   SafetyOutlined, TeamOutlined, LinkOutlined, CheckCircleOutlined,
-  CrownOutlined, CarOutlined, LikeOutlined, WhatsAppOutlined, SearchOutlined, LikeFilled, PaperClipOutlined, ShareAltOutlined
+  CrownOutlined, CarOutlined, LikeOutlined, WhatsAppOutlined, SearchOutlined, LikeFilled, PaperClipOutlined, ShareAltOutlined,
+  UpOutlined, DownOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import loadZipCodeData from '../components/loadZipCodeData'; // Ensure this imports correctly
+
+const { Paragraph, Text } = Typography;
+const MAX_DESCRIPTION_LENGTH = 100;
 
 function BusinessCard({ business }) {
   const [liked, setLiked] = useState(false);
@@ -18,6 +22,7 @@ function BusinessCard({ business }) {
   const [revealPhone, setRevealPhone] = useState(false);
   const [revealEmail, setRevealEmail] = useState(false);
   const [zipCodeData, setZipCodeData] = useState({});
+  const [showFullDescription, setShowFullDescription] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,7 +63,7 @@ function BusinessCard({ business }) {
       const shareUrl = `mailto:?subject=${encodeURIComponent(business.name)}&body=${encodeURIComponent(shareText)}`;
       window.location.href = shareUrl;
     }
-  };  
+  };
 
   function formatPhoneNumber(phone) {
     const cleaned = ('' + phone).replace(/\D/g, '');
@@ -131,9 +136,53 @@ function BusinessCard({ business }) {
     return timeDifference <= 24 * 60 * 60 * 1000; // 24 hours in milliseconds
   };
 
+  const renderDescription = () => {
+    if (showFullDescription) {
+      return (
+        <>
+          <Paragraph style={{ marginTop: '10px', textAlign: 'left', color: 'black', whiteSpace: 'normal' }}>
+            {business.description}
+          </Paragraph>
+          <Button type="link" onClick={() => setShowFullDescription(false)} style={{ padding: 0, height: 'auto', marginTop: '-10px' }}>
+            <UpOutlined />
+          </Button>
+        </>
+      );
+    }
+
+    if (business.description.length > MAX_DESCRIPTION_LENGTH) {
+      return (
+        <>
+          <Paragraph style={{ marginTop: '10px', textAlign: 'left', color: 'black', whiteSpace: 'normal' }}>
+            {`${business.description.substring(0, MAX_DESCRIPTION_LENGTH)}`}
+            <Button type="link" onClick={() => setShowFullDescription(true)} style={{ padding: 0, height: 'auto', color: 'inherit' }}>
+              <DownOutlined />
+            </Button>
+          </Paragraph>
+        </>
+      );
+    }
+
+    return (
+      <Paragraph style={{ marginTop: '10px', textAlign: 'left', color: 'black', whiteSpace: 'normal' }}>
+        {business.description}
+      </Paragraph>
+    );
+  };
+
   return (
     <Badge.Ribbon text="New" color="gray" style={{ display: isNewBusiness() ? 'inline-block' : 'none' }}>
-      <Card style={{ marginTop: '10px', border: `1px solid ${getBorderColor()}`, borderRadius: '5px', width: '100%', color: 'black' }}>
+      <Card 
+        style={{ 
+          marginTop: '10px', 
+          border: `1px solid ${getBorderColor()}`, 
+          borderRadius: '5px', 
+          width: '100%', 
+          color: 'black',
+          overflow: 'hidden'
+        }}
+        bodyStyle={{ padding: '16px' }}
+      >
         <Card.Meta
           title={
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -164,8 +213,8 @@ function BusinessCard({ business }) {
               <div style={{ textAlign: 'left', color: 'grey', fontStyle: 'italic', whiteSpace: 'normal'}}>
                 {Array.isArray(business.service_type) ? business.service_type.join(", ") : business.service_type}
               </div>
-              <p style={{ marginTop: '10px', textAlign: 'left', color: 'black', whiteSpace: 'normal' }}>{business.description}</p>
-              <p style={{ textAlign: 'left', color: 'black' }}>
+              {renderDescription()}
+              <Paragraph style={{ textAlign: 'left', color: 'black' }}>
                 {business.phone && business.display_preferences.includes("phone") && !revealPhone && (
                   <Button onClick={handleRevealPhone} icon={<PhoneOutlined />}>Show Phone</Button>
                 )}
@@ -185,9 +234,9 @@ function BusinessCard({ business }) {
                     <MailOutlined /> <a href={`mailto:${business.email}`} style={{ color: 'inherit' }}>{business.email}</a>
                   </>
                 )}
-              </p>
+              </Paragraph>
               {(business.website || business.display_preferences.includes("militaryDiscount")) && (
-                <p style={{ textAlign: 'left', color: 'black' }}>
+                <Paragraph style={{ textAlign: 'left', color: 'black' }}>
                   {business.website && (
                     <>
                       <LinkOutlined /> <a href={business.website} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Visit Website</a>
@@ -201,10 +250,10 @@ function BusinessCard({ business }) {
                       <CrownOutlined /> Military/Veteran Owned
                     </>
                   )}
-                </p>
+                </Paragraph>
               )}
               {business.zipcode && (
-                <p style={{ textAlign: 'left', color: 'black' }}>
+                <Paragraph style={{ textAlign: 'left', color: 'black' }}>
                   <EnvironmentOutlined /> {business.zipcode}
                   {business.display_preferences.includes("city") && business.city && (
                     <>
@@ -212,10 +261,10 @@ function BusinessCard({ business }) {
                       <CheckCircleOutlined /> Located in {business.city}
                     </>
                   )}
-                </p>
+                </Paragraph>
               )}
               {(business.display_preferences.includes("groupDiscount") || business.display_preferences.includes("licensedInsured")) && (
-                <p style={{ textAlign: 'left', color: 'black' }}>
+                <Paragraph style={{ textAlign: 'left', color: 'black' }}>
                   {business.display_preferences.includes("groupDiscount") && (
                     <>
                       <TeamOutlined /> Offers Group Discount
@@ -229,7 +278,7 @@ function BusinessCard({ business }) {
                       <SafetyOutlined /> Licensed & Insured
                     </>
                   )}
-                </p>
+                </Paragraph>
               )}
               {(business.service_area && business.service_area !== "do_not_display") || business.business_type.includes("residential") || business.business_type.includes("commercial") ? (
                 <div style={{ textAlign: 'left', color: 'black', marginTop: '10px', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -251,17 +300,17 @@ function BusinessCard({ business }) {
                 </div>
               ) : null}
               {business.business_type.includes("deliver") && (
-                <p style={{ textAlign: 'left', color: 'black', marginTop: '10px' }}>
+                <Paragraph style={{ textAlign: 'left', color: 'black', marginTop: '10px' }}>
                   <CarOutlined /> Delivers
-                </p>
+                </Paragraph>
               )}
               {business.display_preferences.includes("hiring") && (
-                <p style={{ textAlign: 'left', color: 'black', marginTop: '10px' }}>
+                <Paragraph style={{ textAlign: 'left', color: 'black', marginTop: '10px' }}>
                   <PaperClipOutlined /> We are Hiring
-                </p>
+                </Paragraph>
               )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
-                <div>
+              <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
+                <Space>
                   {business.instagram && (
                     <Button
                       shape="circle"
@@ -287,23 +336,21 @@ function BusinessCard({ business }) {
                       />
                     </Tooltip>
                   )}
-                </div>
-                <div>
+                </Space>
+                <Space>
                   <Button
                     shape="circle"
                     icon={<ShareAltOutlined />}
                     onClick={shareBusiness}
                   />
-                </div>
-                <div>
                   <Button
                     shape="circle"
                     icon={liked ? <LikeFilled /> : <LikeOutlined />}
                     onClick={toggleLike}
                   />
                   <span style={{ marginLeft: '8px' }}>{likesCount}</span>
-                </div>
-              </div>
+                </Space>
+              </Space>
             </>
           )}
         />
