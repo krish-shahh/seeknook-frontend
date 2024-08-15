@@ -312,11 +312,11 @@ const CreateBusinessListing = ({ initialValues, onCancel, onSuccess, onSave }) =
           <Input placeholder="Enter your email" disabled />
         </Form.Item>
 
-        <Form.Item name="phone" label="Phone" rules={[{ required: true, message: 'Please input your phone number!' }]}>
+        <Form.Item name="phone" label="Phone (Format: XXXXXXXXXX)" rules={[{ required: true, message: 'Please input your phone number!' }]}>
           <Input placeholder="Enter your phone number" maxLength={10} minLength={10} />
         </Form.Item>
 
-        <Form.Item name="zipcode" label="Zipcode" rules={[{ required: true, message: 'Please input your zipcode!' }]}>
+        <Form.Item name="zipcode" label="Zipcode (Format: XXXXX)" rules={[{ required: true, message: 'Please input your zipcode!' }]}>
           <Input placeholder="Enter your zipcode" maxLength={5} minLength={5} onChange={onZipcodeChange} />
         </Form.Item>
 

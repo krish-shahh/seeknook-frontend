@@ -217,7 +217,7 @@ const CreateFranchiseOpportunity = ({ initialValues, onCancel, onSuccess, onSave
           name="phone"
           label={
             <span>
-              Phone&nbsp;
+              Phone (Format: XXXXXXXXXX) &nbsp;
               <Tooltip title="International users, please enter '9999999999'">
                 <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
               </Tooltip>
@@ -232,7 +232,7 @@ const CreateFranchiseOpportunity = ({ initialValues, onCancel, onSuccess, onSave
           name="zipcode"
           label={
             <span>
-              Zipcode&nbsp;
+              Zipcode (Format: XXXXX) &nbsp;
               <Tooltip title="International users, please enter '00000'">
                 <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
               </Tooltip>
